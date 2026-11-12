@@ -1,5 +1,6 @@
 <Solution>
   <Folder Name="/src/">
     <Project Path="src/HbysFhirBridge.Core/HbysFhirBridge.Core.csproj" />
+    <Project Path="src/HbysFhirBridge.Synthetic/HbysFhirBridge.Synthetic.csproj" />
   </Folder>
 </Solution>

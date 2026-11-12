@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Description>Deterministic synthetic HBYS data (patients, visits, laboratory results) with a controlled share of dirty rows.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Bogus" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\HbysFhirBridge.Core\HbysFhirBridge.Core.csproj" />
+  </ItemGroup>
+
+</Project>
