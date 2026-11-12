@@ -1,0 +1,35 @@
+{
+  "resourceType": "Encounter",
+  "id": "61570c63-fe5c-5f0f-8fc3-af9f9f44251c",
+  "meta": {
+    "profile": [
+      "https://hbys.example.org/fhir/StructureDefinition/hbys-encounter"
+    ]
+  },
+  "identifier": [
+    {
+      "system": "https://hbys.example.org/fhir/sid/basvuru-no",
+      "value": "11"
+    }
+  ],
+  "status": "in-progress",
+  "class": {
+    "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode",
+    "code": "IMP",
+    "display": "inpatient encounter"
+  },
+  "serviceType": {
+    "coding": [
+      {
+        "system": "https://hbys.example.org/fhir/CodeSystem/brans",
+        "code": "KAR"
+      }
+    ]
+  },
+  "subject": {
+    "reference": "Patient/3b7bdcf1-9587-5c52-afa1-ae6a56955de2"
+  },
+  "period": {
+    "start": "2026-03-02T09:30:00+03:00"
+  }
+}

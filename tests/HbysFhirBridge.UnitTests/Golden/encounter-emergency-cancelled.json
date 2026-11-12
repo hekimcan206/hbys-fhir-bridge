@@ -1,0 +1,27 @@
+{
+  "resourceType": "Encounter",
+  "id": "ba591c81-0d2d-5822-a7b9-cb3eac94ab6a",
+  "meta": {
+    "profile": [
+      "https://hbys.example.org/fhir/StructureDefinition/hbys-encounter"
+    ]
+  },
+  "identifier": [
+    {
+      "system": "https://hbys.example.org/fhir/sid/basvuru-no",
+      "value": "12"
+    }
+  ],
+  "status": "cancelled",
+  "class": {
+    "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode",
+    "code": "EMER",
+    "display": "emergency"
+  },
+  "subject": {
+    "reference": "Patient/3b7bdcf1-9587-5c52-afa1-ae6a56955de2"
+  },
+  "period": {
+    "start": "2026-03-02T09:30:00+03:00"
+  }
+}

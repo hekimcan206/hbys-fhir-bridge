@@ -1,0 +1,35 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+    <!-- The Firely model types are not nullable-annotated for navigation; tests dereference them freely on purpose. -->
+    <NoWarn>$(NoWarn);CS8600;CS8601;CS8602;CS8604</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="xunit.v3" />
+    <PackageReference Include="AwesomeAssertions" />
+    <PackageReference Include="FsCheck.Xunit.v3" />
+    <PackageReference Include="Microsoft.Testing.Extensions.CodeCoverage" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\HbysFhirBridge.Core\HbysFhirBridge.Core.csproj" />
+    <ProjectReference Include="..\..\src\HbysFhirBridge.Synthetic\HbysFhirBridge.Synthetic.csproj" />
+    <ProjectReference Include="..\..\src\HbysFhirBridge.Fhir\HbysFhirBridge.Fhir.csproj" />
+    <ProjectReference Include="..\..\src\HbysFhirBridge.Oracle\HbysFhirBridge.Oracle.csproj" />
+    <ProjectReference Include="..\..\src\HbysFhirBridge.Worker\HbysFhirBridge.Worker.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Golden\**\*.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+    <Using Include="AwesomeAssertions" />
+  </ItemGroup>
+
+</Project>

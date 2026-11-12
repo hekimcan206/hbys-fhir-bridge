@@ -1,0 +1,58 @@
+{
+  "resourceType": "Observation",
+  "id": "ecf60260-dfdd-5bb7-ac03-6569f6200e03",
+  "meta": {
+    "profile": [
+      "https://hbys.example.org/fhir/StructureDefinition/hbys-lab-observation"
+    ]
+  },
+  "identifier": [
+    {
+      "system": "https://hbys.example.org/fhir/sid/sonuc-no",
+      "value": "104"
+    }
+  ],
+  "status": "final",
+  "category": [
+    {
+      "coding": [
+        {
+          "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+          "code": "laboratory"
+        }
+      ],
+      "text": "Laboratory"
+    }
+  ],
+  "code": {
+    "coding": [
+      {
+        "system": "http://loinc.org",
+        "code": "2345-7",
+        "display": "Glucose [Mass/volume] in Serum or Plasma"
+      },
+      {
+        "system": "https://hbys.example.org/fhir/CodeSystem/tetkik-kodu",
+        "code": "BIY-GLU",
+        "display": "Glukoz (aclik)"
+      }
+    ],
+    "text": "Glukoz (aclik)"
+  },
+  "subject": {
+    "reference": "Patient/3b7bdcf1-9587-5c52-afa1-ae6a56955de2"
+  },
+  "encounter": {
+    "reference": "Encounter/2e92eb07-842f-5398-a07e-e8d855ac13fd"
+  },
+  "effectiveDateTime": "2026-03-02T10:30:00+03:00",
+  "dataAbsentReason": {
+    "coding": [
+      {
+        "system": "http://terminology.hl7.org/CodeSystem/data-absent-reason",
+        "code": "unknown"
+      }
+    ],
+    "text": "Unknown"
+  }
+}

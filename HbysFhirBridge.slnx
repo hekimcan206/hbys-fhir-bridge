@@ -6,4 +6,7 @@
     <Project Path="src/HbysFhirBridge.Fhir/HbysFhirBridge.Fhir.csproj" />
     <Project Path="src/HbysFhirBridge.Worker/HbysFhirBridge.Worker.csproj" />
   </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/HbysFhirBridge.UnitTests/HbysFhirBridge.UnitTests.csproj" />
+  </Folder>
 </Solution>

@@ -1,0 +1,55 @@
+{
+  "resourceType": "Observation",
+  "id": "26fda63a-3d58-50f9-98a6-1ec7ba971657",
+  "meta": {
+    "profile": [
+      "https://hbys.example.org/fhir/StructureDefinition/hbys-lab-observation"
+    ]
+  },
+  "identifier": [
+    {
+      "system": "https://hbys.example.org/fhir/sid/sonuc-no",
+      "value": "105"
+    }
+  ],
+  "status": "preliminary",
+  "category": [
+    {
+      "coding": [
+        {
+          "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+          "code": "laboratory"
+        }
+      ],
+      "text": "Laboratory"
+    }
+  ],
+  "code": {
+    "coding": [
+      {
+        "system": "http://loinc.org",
+        "code": "6690-2",
+        "display": "Leukocytes [#/volume] in Blood by Automated count"
+      },
+      {
+        "system": "https://hbys.example.org/fhir/CodeSystem/tetkik-kodu",
+        "code": "HEM-WBC",
+        "display": "Lokosit (WBC)"
+      }
+    ],
+    "text": "Lokosit (WBC)"
+  },
+  "subject": {
+    "reference": "Patient/3b7bdcf1-9587-5c52-afa1-ae6a56955de2"
+  },
+  "encounter": {
+    "reference": "Encounter/2e92eb07-842f-5398-a07e-e8d855ac13fd"
+  },
+  "effectiveDateTime": "2026-03-02T10:30:00+03:00",
+  "valueQuantity": {
+    "value": 7.2,
+    "unit": "10*3/uL",
+    "system": "http://unitsofmeasure.org",
+    "code": "10*3/uL"
+  }
+}

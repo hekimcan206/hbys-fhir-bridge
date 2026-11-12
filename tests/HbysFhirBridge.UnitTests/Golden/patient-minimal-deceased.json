@@ -1,0 +1,37 @@
+{
+  "resourceType": "Patient",
+  "id": "e6d759d1-63c2-5deb-a309-bd066276d68c",
+  "meta": {
+    "profile": [
+      "https://hbys.example.org/fhir/StructureDefinition/hbys-patient"
+    ]
+  },
+  "identifier": [
+    {
+      "use": "usual",
+      "type": {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+            "code": "MR"
+          }
+        ],
+        "text": "Medical record number"
+      },
+      "system": "https://hbys.example.org/fhir/sid/dosya-no",
+      "value": "D00000002"
+    }
+  ],
+  "active": false,
+  "name": [
+    {
+      "use": "official",
+      "family": "Kaya",
+      "given": [
+        "Mehmet"
+      ]
+    }
+  ],
+  "gender": "unknown",
+  "deceasedDateTime": "2026-02-01"
+}
