@@ -1,0 +1,187 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+  NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
+
+jobs:
+  build-test:
+    name: build & unit tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-dotnet@v6
+        with:
+          global-json-file: global.json
+
+      - uses: actions/cache@v6
+        with:
+          path: ${{ env.NUGET_PACKAGES }}
+          key: nuget-${{ runner.os }}-${{ hashFiles('Directory.Packages.props', '**/*.csproj', 'global.json') }}
+          restore-keys: nuget-${{ runner.os }}-
+
+      - name: Restore
+        run: dotnet restore
+
+      # Package versions are pinned and updated by hand, so a known vulnerability in any direct or
+      # transitive package fails the build. Fix it with a pinned upgrade in Directory.Packages.props.
+      - name: Audit for vulnerable packages
+        run: |
+          set -o pipefail
+          dotnet list package --vulnerable --include-transitive 2>&1 | tee vulnerable-packages.txt
+          if grep -q "has the following vulnerable packages" vulnerable-packages.txt; then
+            echo "::error::Known-vulnerable NuGet packages found (see the list above)"
+            exit 1
+          fi
+
+      - name: Format check
+        run: dotnet format --verify-no-changes --no-restore
+
+      - name: Build (warnings are errors)
+        run: dotnet build --no-restore --configuration Release
+
+      - name: Unit, property and golden tests
+        run: >
+          dotnet test --no-build --configuration Release
+          --project tests/HbysFhirBridge.UnitTests
+          --coverage --coverage-output-format cobertura
+          --results-directory "${{ github.workspace }}/TestResults"
+
+      - name: Coverage summary
+        if: always()
+        uses: danielpalme/ReportGenerator-GitHub-Action@5.5.12
+        with:
+          reports: TestResults/**/*.cobertura.xml
+          targetdir: coverage
+          reporttypes: MarkdownSummaryGithub
+          assemblyfilters: "-*Tests*;-*Benchmarks*"
+          filefilters: "-*/obj/*"
+
+      - name: Publish coverage to job summary
+        if: always()
+        run: |
+          if [ -f coverage/SummaryGithub.md ]; then
+            cat coverage/SummaryGithub.md >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "No coverage report produced."
+          fi
+
+      - uses: actions/upload-artifact@v7
+        if: failure()
+        with:
+          name: unit-test-results
+          path: TestResults/
+          retention-days: 7
+
+  integration:
+    name: integration (Oracle 23ai + Blaze)
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-dotnet@v6
+        with:
+          global-json-file: global.json
+
+      - uses: actions/cache@v6
+        with:
+          path: ${{ env.NUGET_PACKAGES }}
+          key: nuget-${{ runner.os }}-${{ hashFiles('Directory.Packages.props', '**/*.csproj', 'global.json') }}
+          restore-keys: nuget-${{ runner.os }}-
+
+      # Testcontainers starts gvenzl/oracle-free:23-slim-faststart and samply/blaze:1.12.0 on the runner's Docker engine.
+      - name: Integration tests
+        run: >
+          dotnet test --configuration Release
+          --project tests/HbysFhirBridge.IntegrationTests
+          --results-directory "${{ github.workspace }}/TestResults"
+
+      - uses: actions/upload-artifact@v7
+        if: failure()
+        with:
+          name: integration-test-results
+          path: TestResults/
+          retention-days: 7
+
+  container:
+    name: container image
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: docker/setup-buildx-action@v4
+
+      - name: Build image
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          push: false
+          load: true
+          tags: hbys-fhir-bridge:ci
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Verify the image runs as non-root
+        run: |
+          user=$(docker image inspect hbys-fhir-bridge:ci --format '{{.Config.User}}')
+          echo "Configured user: ${user}"
+          test -n "${user}" && test "${user}" != "0" && test "${user}" != "root"
+
+  compose-demo:
+    name: docker compose demo
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v7
+
+      # The README promises `docker compose up` runs the whole demo with zero manual steps; this job keeps it true.
+      - name: Start the stack
+        run: docker compose up -d --build
+
+      - name: Wait for the seed and the simulated HBYS workload
+        run: |
+          test "$(docker wait hbys-fhir-bridge-seed-1)" = "0" || { docker compose logs seed; exit 1; }
+          docker compose logs seed
+          test "$(docker wait hbys-fhir-bridge-workload-1)" = "0" || { docker compose logs workload; exit 1; }
+          docker compose logs workload
+
+      - name: Bridge becomes ready
+        run: |
+          for i in $(seq 1 90); do
+            curl -fsS http://localhost:18481/health/ready && break
+            sleep 2
+          done
+          curl -fsS http://localhost:18481/health/ready
+          curl -fsS http://localhost:18481/status | tee status.json
+
+      - name: FHIR server mirrors the source (counts per type + deep comparison of a sample)
+        run: docker compose run --rm --no-deps bridge verify --sample 300 --wait-seconds 180
+
+      - name: Dirty rows are parked, not delivered
+        run: |
+          curl -fsS http://localhost:18481/status | tee status.json
+          parked=$(grep -o '"parked":[0-9]*' status.json | head -1 | cut -d: -f2)
+          echo "parked rows: ${parked}"
+          test "${parked}" -gt 0
+
+      - name: Logs on failure
+        if: failure()
+        run: docker compose logs
