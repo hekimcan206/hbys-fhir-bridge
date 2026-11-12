@@ -1,0 +1,81 @@
+# `docker compose up` runs the whole demo with zero manual steps:
+#   oracle  synthetic HBYS schema owner + bridge login (Oracle Database 23ai Free)
+#   blaze   FHIR R4 server
+#   seed    installs the schemas, loads 200 synthetic patients (2% dirty rows), then simulates 60 s of HBYS writes
+#   bridge  the sync loop: http://localhost:18481/status and /health/ready
+# All passwords below are demo values for throwaway local containers; override them with a .env file.
+name: hbys-fhir-bridge
+
+x-bridge-image: &bridge-image
+  image: hbys-fhir-bridge:local
+  build:
+    context: .
+    dockerfile: Dockerfile
+
+x-bridge-env: &bridge-env
+  Bridge__ConnectionString: "User Id=hbys_bridge;Password=${BRIDGE_PASSWORD:-BridgeDemo1};Data Source=oracle:1521/FREEPDB1"
+  Bridge__OwnerConnectionString: "User Id=hbys;Password=${HBYS_PASSWORD:-HbysDemo1};Data Source=oracle:1521/FREEPDB1"
+  Bridge__FhirBaseUrl: "http://blaze:8080/fhir/"
+
+services:
+  oracle:
+    image: gvenzl/oracle-free:23-slim-faststart
+    environment:
+      ORACLE_RANDOM_PASSWORD: "true"
+      HBYS_PASSWORD: ${HBYS_PASSWORD:-HbysDemo1}
+      BRIDGE_PASSWORD: ${BRIDGE_PASSWORD:-BridgeDemo1}
+    volumes:
+      - ./deploy/oracle/init:/container-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD", "healthcheck.sh"]
+      interval: 5s
+      timeout: 5s
+      retries: 60
+      start_period: 10s
+
+  blaze:
+    image: samply/blaze:1.12.0
+    environment:
+      JAVA_TOOL_OPTIONS: "-Xmx768m"
+      DB_BLOCK_CACHE_SIZE: "128"
+      DB_RESOURCE_CACHE_SIZE: "20000"
+    ports:
+      - "127.0.0.1:18480:8080"
+    volumes:
+      - blaze-data:/app/data
+
+  seed:
+    <<: *bridge-image
+    command: ["seed", "--patients", "200", "--dirty-rate", "0.02"]
+    environment:
+      <<: *bridge-env
+    depends_on:
+      oracle:
+        condition: service_healthy
+
+  workload:
+    <<: *bridge-image
+    command: ["workload", "--seconds", "60", "--ops-per-second", "10"]
+    environment:
+      <<: *bridge-env
+    depends_on:
+      seed:
+        condition: service_completed_successfully
+
+  bridge:
+    <<: *bridge-image
+    # No container HEALTHCHECK: the chiseled image has no shell or curl; probe /health/ready from outside.
+    environment:
+      <<: *bridge-env
+      ASPNETCORE_URLS: "http://+:8080"
+    ports:
+      - "127.0.0.1:18481:8080"
+    depends_on:
+      seed:
+        condition: service_completed_successfully
+      blaze:
+        condition: service_started
+    restart: unless-stopped
+
+volumes:
+  blaze-data:
