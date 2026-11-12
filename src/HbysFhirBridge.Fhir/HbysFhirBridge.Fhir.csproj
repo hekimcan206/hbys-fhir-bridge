@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Description>FHIR server side of hbys-fhir-bridge: transaction sink and a small read client for verification.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="HbysFhirBridge.UnitTests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\HbysFhirBridge.Core\HbysFhirBridge.Core.csproj" />
+  </ItemGroup>
+
+</Project>

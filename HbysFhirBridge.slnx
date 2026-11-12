@@ -3,5 +3,6 @@
     <Project Path="src/HbysFhirBridge.Core/HbysFhirBridge.Core.csproj" />
     <Project Path="src/HbysFhirBridge.Synthetic/HbysFhirBridge.Synthetic.csproj" />
     <Project Path="src/HbysFhirBridge.Oracle/HbysFhirBridge.Oracle.csproj" />
+    <Project Path="src/HbysFhirBridge.Fhir/HbysFhirBridge.Fhir.csproj" />
   </Folder>
 </Solution>
