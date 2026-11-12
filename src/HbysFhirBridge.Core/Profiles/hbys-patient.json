@@ -1,0 +1,44 @@
+{
+  "resourceType": "StructureDefinition",
+  "id": "hbys-patient",
+  "url": "https://hbys.example.org/fhir/StructureDefinition/hbys-patient",
+  "version": "1.0.0",
+  "name": "HbysPatient",
+  "title": "HBYS Patient",
+  "status": "active",
+  "description": "A patient exported by hbys-fhir-bridge. Every patient carries the hospital file number (DOSYA_NO), a name and an administrative gender.",
+  "fhirVersion": "4.0.1",
+  "kind": "resource",
+  "abstract": false,
+  "type": "Patient",
+  "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Patient",
+  "derivation": "constraint",
+  "differential": {
+    "element": [
+      {
+        "id": "Patient",
+        "path": "Patient",
+        "constraint": [
+          {
+            "key": "hbys-pat-1",
+            "severity": "error",
+            "human": "A patient carries its hospital file number (DOSYA_NO) identifier",
+            "expression": "identifier.where(system = 'https://hbys.example.org/fhir/sid/dosya-no' and value.exists()).exists()",
+            "source": "https://hbys.example.org/fhir/StructureDefinition/hbys-patient"
+          },
+          {
+            "key": "hbys-pat-2",
+            "severity": "error",
+            "human": "A date of death cannot precede the date of birth",
+            "expression": "(birthDate.exists() and deceased.ofType(dateTime).exists()) implies deceased.ofType(dateTime) >= birthDate",
+            "source": "https://hbys.example.org/fhir/StructureDefinition/hbys-patient"
+          }
+        ]
+      },
+      { "id": "Patient.identifier", "path": "Patient.identifier", "min": 1 },
+      { "id": "Patient.name", "path": "Patient.name", "min": 1 },
+      { "id": "Patient.name.family", "path": "Patient.name.family", "min": 1 },
+      { "id": "Patient.gender", "path": "Patient.gender", "min": 1 }
+    ]
+  }
+}

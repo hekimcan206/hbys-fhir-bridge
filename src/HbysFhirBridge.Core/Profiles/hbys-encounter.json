@@ -1,0 +1,44 @@
+{
+  "resourceType": "StructureDefinition",
+  "id": "hbys-encounter",
+  "url": "https://hbys.example.org/fhir/StructureDefinition/hbys-encounter",
+  "version": "1.0.0",
+  "name": "HbysEncounter",
+  "title": "HBYS Encounter",
+  "status": "active",
+  "description": "A visit or admission (BASVURU) exported by hbys-fhir-bridge. It always has a subject and a start time; a finished visit also has an end time.",
+  "fhirVersion": "4.0.1",
+  "kind": "resource",
+  "abstract": false,
+  "type": "Encounter",
+  "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Encounter",
+  "derivation": "constraint",
+  "differential": {
+    "element": [
+      {
+        "id": "Encounter",
+        "path": "Encounter",
+        "constraint": [
+          {
+            "key": "hbys-enc-1",
+            "severity": "error",
+            "human": "A finished encounter has an end time",
+            "expression": "status = 'finished' implies period.end.exists()",
+            "source": "https://hbys.example.org/fhir/StructureDefinition/hbys-encounter"
+          },
+          {
+            "key": "hbys-enc-2",
+            "severity": "error",
+            "human": "An encounter cannot end before it starts",
+            "expression": "period.end.exists() implies period.end >= period.start",
+            "source": "https://hbys.example.org/fhir/StructureDefinition/hbys-encounter"
+          }
+        ]
+      },
+      { "id": "Encounter.identifier", "path": "Encounter.identifier", "min": 1 },
+      { "id": "Encounter.subject", "path": "Encounter.subject", "min": 1 },
+      { "id": "Encounter.period", "path": "Encounter.period", "min": 1 },
+      { "id": "Encounter.period.start", "path": "Encounter.period.start", "min": 1 }
+    ]
+  }
+}

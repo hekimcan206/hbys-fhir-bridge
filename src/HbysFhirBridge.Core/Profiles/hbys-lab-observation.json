@@ -1,0 +1,59 @@
+{
+  "resourceType": "StructureDefinition",
+  "id": "hbys-lab-observation",
+  "url": "https://hbys.example.org/fhir/StructureDefinition/hbys-lab-observation",
+  "version": "1.0.0",
+  "name": "HbysLabObservation",
+  "title": "HBYS Laboratory Observation",
+  "status": "active",
+  "description": "A laboratory result (LAB_SONUC) exported by hbys-fhir-bridge: LOINC-coded, laboratory category, linked to its patient and encounter, with UCUM units.",
+  "fhirVersion": "4.0.1",
+  "kind": "resource",
+  "abstract": false,
+  "type": "Observation",
+  "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Observation",
+  "derivation": "constraint",
+  "differential": {
+    "element": [
+      {
+        "id": "Observation",
+        "path": "Observation",
+        "constraint": [
+          {
+            "key": "hbys-obs-1",
+            "severity": "error",
+            "human": "The test is coded with LOINC",
+            "expression": "code.coding.where(system = 'http://loinc.org' and code.exists()).exists()",
+            "source": "https://hbys.example.org/fhir/StructureDefinition/hbys-lab-observation"
+          },
+          {
+            "key": "hbys-obs-2",
+            "severity": "error",
+            "human": "The observation is in the laboratory category",
+            "expression": "category.coding.where(system = 'http://terminology.hl7.org/CodeSystem/observation-category' and code = 'laboratory').exists()",
+            "source": "https://hbys.example.org/fhir/StructureDefinition/hbys-lab-observation"
+          },
+          {
+            "key": "hbys-obs-3",
+            "severity": "error",
+            "human": "A final or corrected result has a value or a reason why it is absent",
+            "expression": "(status = 'final' or status = 'corrected') implies (value.exists() or dataAbsentReason.exists())",
+            "source": "https://hbys.example.org/fhir/StructureDefinition/hbys-lab-observation"
+          },
+          {
+            "key": "hbys-obs-4",
+            "severity": "error",
+            "human": "Quantities use UCUM units",
+            "expression": "value.ofType(Quantity).exists() implies (value.ofType(Quantity).system = 'http://unitsofmeasure.org' and value.ofType(Quantity).code.exists())",
+            "source": "https://hbys.example.org/fhir/StructureDefinition/hbys-lab-observation"
+          }
+        ]
+      },
+      { "id": "Observation.identifier", "path": "Observation.identifier", "min": 1 },
+      { "id": "Observation.category", "path": "Observation.category", "min": 1 },
+      { "id": "Observation.subject", "path": "Observation.subject", "min": 1 },
+      { "id": "Observation.encounter", "path": "Observation.encounter", "min": 1 },
+      { "id": "Observation.effective[x]", "path": "Observation.effective[x]", "min": 1 }
+    ]
+  }
+}
