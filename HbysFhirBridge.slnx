@@ -10,4 +10,7 @@
     <Project Path="tests/HbysFhirBridge.UnitTests/HbysFhirBridge.UnitTests.csproj" />
     <Project Path="tests/HbysFhirBridge.IntegrationTests/HbysFhirBridge.IntegrationTests.csproj" />
   </Folder>
+  <Folder Name="/benchmarks/">
+    <Project Path="benchmarks/HbysFhirBridge.Benchmarks/HbysFhirBridge.Benchmarks.csproj" />
+  </Folder>
 </Solution>
