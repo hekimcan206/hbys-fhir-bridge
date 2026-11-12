@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Description>Maps a relational HBYS schema to HL7 FHIR R4 resources, validates them and builds idempotent transaction bundles.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Hl7.Fhir.R4" />
+    <!-- specification.zip is a content file; PrivateAssets="none" lets it flow to every project that references Core. -->
+    <PackageReference Include="Hl7.Fhir.Specification.Data.R4" PrivateAssets="none" />
+    <PackageReference Include="Firely.Fhir.Validation.R4" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Profiles/*.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="HbysFhirBridge.UnitTests" />
+  </ItemGroup>
+
+</Project>
