@@ -2,5 +2,6 @@
   <Folder Name="/src/">
     <Project Path="src/HbysFhirBridge.Core/HbysFhirBridge.Core.csproj" />
     <Project Path="src/HbysFhirBridge.Synthetic/HbysFhirBridge.Synthetic.csproj" />
+    <Project Path="src/HbysFhirBridge.Oracle/HbysFhirBridge.Oracle.csproj" />
   </Folder>
 </Solution>

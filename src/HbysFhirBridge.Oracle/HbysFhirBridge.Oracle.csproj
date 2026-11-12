@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Description>Oracle side of hbys-fhir-bridge: schema installer, change journal source, parking and checkpoint store, synthetic seeding.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Oracle.ManagedDataAccess.Core" />
+    <PackageReference Include="System.Security.Cryptography.Pkcs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\HbysFhirBridge.Core\HbysFhirBridge.Core.csproj" />
+    <ProjectReference Include="..\HbysFhirBridge.Synthetic\HbysFhirBridge.Synthetic.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Sql/*.sql" LogicalName="HbysFhirBridge.Oracle.Sql.%(Filename)%(Extension)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="HbysFhirBridge.UnitTests" />
+    <InternalsVisibleTo Include="HbysFhirBridge.IntegrationTests" />
+  </ItemGroup>
+
+</Project>
